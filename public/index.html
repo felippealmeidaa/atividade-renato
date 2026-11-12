@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Chat - Grupo 4 | LLMs em Sistemas Distribuídos</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 720px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+      max-height: 780px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Cabeçalho */
+    header {
+      background: #1e293b;
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-group {
+      background: #3b82f6;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .system-diagram {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .system-diagram span.step {
+      background: #334155;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #f1f5f9;
+    }
+
+    /* Área de mensagens */
+    .chat-box {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #f8fafc;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      word-break: break-word;
+      animation: fadeIn 0.2s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: #2563eb;
+      color: white;
+      border-bottom-right-radius: 2px;
+    }
+
+    .message.bot {
+      align-self: flex-start;
+      background: white;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+      border-bottom-left-radius: 2px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+
+    .message.bot .meta-provider {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.72rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    /* Sugestões rápidas */
+    .suggestions {
+      padding: 8px 16px;
+      background: #f1f5f9;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .suggestion-btn {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .suggestion-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* Formulário de envio */
+    form {
+      display: flex;
+      padding: 14px 16px;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 24px;
+      outline: none;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #2563eb;
+    }
+
+    button[type="submit"] {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 0 22px;
+      border-radius: 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.2s;
+    }
+
+    button[type="submit"]:hover {
+      background: #1d4ed8;
+    }
+
+    button[type="submit"]:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    /* Status de carregamento */
+    .loading-indicator {
+      display: none;
+      font-size: 0.82rem;
+      color: #64748b;
+      font-style: italic;
+      padding: 4px 16px;
+      background: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Cabeçalho com status e conceito distribuído -->
+    <header>
+      <div class="header-top">
+        <h1>💬 Mini Chat com LLM</h1>
+        <span class="badge-group">Grupo 4</span>
+      </div>
+      <div class="system-diagram">
+        <span>Arquitetura:</span>
+        <span class="step">Navegador (Front-end)</span>
+        <span>➡️ [POST /api/chat] ➡️</span>
+        <span class="step">server.js (Back-end)</span>
+        <span>➡️ [API Key Segura] ➡️</span>
+        <span class="step">LLM (Gemini / OpenAI)</span>
+      </div>
+    </header>
+
+    <!-- Área de mensagens do chat -->
+    <div class="chat-box" id="chatBox">
+      <div class="message bot">
+        Olá! Eu sou o assistente do Grupo 4. Envie uma pergunta sobre nossa aula de Desenvolvimento Web ou Sistemas Distribuídos!
+      </div>
+    </div>
+
+    <!-- Indicador de digitação -->
+    <div class="loading-indicator" id="loadingIndicator">
+      ⏳ O servidor está consultando o LLM... aguarde.
+    </div>
+
+    <!-- Sugestões de teste rápido -->
+    <div class="suggestions">
+      <button class="suggestion-btn" onclick="preencherPergunta('O que é um sistema distribuído?')">💡 O que é sistema distribuído?</button>
+      <button class="suggestion-btn" onclick="preencherPergunta('Por que a API Key não pode ficar no front-end?')">🔒 Por que proteger a API Key?</button>
+      <button class="suggestion-btn" onclick="preencherPergunta('O que é desacoplamento de software?')">🧩 O que é desacoplamento?</button>
+    </div>
+
+    <!-- Formulário simples de envio -->
+    <form id="chatForm">
+      <input 
+        type="text" 
+        id="userInput" 
+        placeholder="Digite sua mensagem aqui..." 
+        autocomplete="off" 
+        required 
+      />
+      <button type="submit" id="sendBtn">Enviar</button>
+    </form>
+  </div>
+
+  <script>
+    // ========================================================================
+    // CÓDIGO SIMPLES DO FRONT-END (GRUPO 4)
+    // ========================================================================
+    const chatForm = document.getElementById('chatForm');
+    const userInput = document.getElementById('userInput');
+    const chatBox = document.getElementById('chatBox');
+    const sendBtn = document.getElementById('sendBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+
+    // Função utilitária para adicionar mensagens no chat
+    function adicionarMensagem(texto, remetente, provedor = null) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message', remetente);
+
+      // Converte quebras de linha em <br> para leitura fácil
+      msgDiv.innerHTML = texto.replace(/\n/g, '<br>');
+
+      // Se for resposta do bot, mostra qual provedor respondeu
+      if (remetente === 'bot' && provedor) {
+        const metaSpan = document.createElement('div');
+        metaSpan.classList.add('meta-provider');
+        metaSpan.textContent = `Provedor: ${provedor}`;
+        msgDiv.appendChild(metaSpan);
+      }
+
+      chatBox.appendChild(msgDiv);
+      // Rola automaticamente para a última mensagem
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Função para preencher perguntas sugeridas
+    function preencherPergunta(texto) {
+      userInput.value = texto;
+      userInput.focus();
+    }
+
+    // Evento de envio do formulário
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const mensagem = userInput.value.trim();
+      if (!mensagem) return;
+
+      // 1. Mostra a mensagem do usuário na tela
+      adicionarMensagem(mensagem, 'user');
+      userInput.value = '';
+
+      // 2. Trava o botão e exibe o "carregando"
+      userInput.disabled = true;
+      sendBtn.disabled = true;
+      loadingIndicator.style.display = 'block';
+
+      try {
+        // ====================================================================
+        // COMUNICAÇÃO FRONT-END -> BACK-END (FETCH)
+        // ====================================================================
+        // O front-end NÃO chama o Gemini ou OpenAI diretamente!
+        // Ele faz um POST simples para o nosso servidor local (/api/chat).
+        const resposta = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: mensagem })
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+          throw new Error(dados.error || 'Erro ao comunicar com o servidor');
+        }
+
+        // 3. Exibe a resposta recebida do back-end
+        adicionarMensagem(dados.reply, 'bot', dados.provider);
+
+      } catch (erro) {
+        adicionarMensagem(`❌ Erro: ${erro.message}`, 'message error');
+      } finally {
+        // 4. Reabilita os campos
+        userInput.disabled = false;
+        sendBtn.disabled = false;
+        loadingIndicator.style.display = 'none';
+        userInput.focus();
+      }
+    });
+  </script>
+</body>
+</html>

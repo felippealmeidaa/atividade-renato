@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apresentação Grupo 4 - Mini Chat com LLM em Sistemas Distribuídos</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Container do Slide (16:9) */
+    .slide-deck {
+      position: relative;
+      width: 90vw;
+      max-width: 1000px;
+      height: 70vh;
+      max-height: 600px;
+      background: #1e293b;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid #334155;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 40px 50px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Cabeçalhos e Títulos */
+    .slide-header {
+      border-bottom: 2px solid #334155;
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slide-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .slide-subtitle {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    .slide-body {
+      flex: 1;
+      padding: 24px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+      font-size: 1.15rem;
+      line-height: 1.6;
+    }
+
+    /* Estilos de Cartões e Destaques */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card ul {
+      margin-left: 20px;
+      color: #cbd5e1;
+    }
+
+    .card li {
+      margin-bottom: 8px;
+    }
+
+    /* Diagrama de fluxo */
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      padding: 24px 16px;
+      border-radius: 12px;
+      border: 1px dashed #475569;
+    }
+
+    .flow-step {
+      text-align: center;
+      flex: 1;
+    }
+
+    .flow-box {
+      background: #1e293b;
+      border: 2px solid #38bdf8;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: bold;
+      color: #f8fafc;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .flow-box.highlight {
+      border-color: #4ade80;
+      background: #064e3b;
+    }
+
+    .flow-desc {
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+
+    .flow-arrow {
+      color: #38bdf8;
+      font-size: 1.5rem;
+      font-weight: bold;
+      padding: 0 10px;
+    }
+
+    /* Destaques de Código */
+    code {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.95em;
+    }
+
+    pre {
+      background: #090d16;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 14px;
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      line-height: 1.4;
+    }
+
+    /* Rodapé dos Slides */
+    .slide-footer {
+      border-top: 1px solid #334155;
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* Barra de Navegação */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    button.nav-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    button.nav-btn:hover {
+      background: #1d4ed8;
+    }
+
+    button.nav-btn:disabled {
+      background: #334155;
+      cursor: not-allowed;
+      color: #64748b;
+    }
+
+    .slide-counter {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .shortcut-hint {
+      margin-top: 10px;
+      color: #64748b;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slide-deck">
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 1: CAPA -->
+    <!-- ================================================================== -->
+    <div class="slide active" id="slide-1">
+      <div class="slide-header">
+        <span class="slide-subtitle">Desenvolvimento Web | Prof. Renato</span>
+        <span class="slide-subtitle">Sala de Aula Invertida</span>
+      </div>
+      <div class="slide-body" style="text-align: center; gap: 24px;">
+        <div style="font-size: 3rem;">💬 ➡️ 🖥️ ➡️ 🤖</div>
+        <h1 style="font-size: 2.4rem; color: #38bdf8;">Laboratório do Mini Chat</h1>
+        <p style="font-size: 1.3rem; color: #cbd5e1;">Comunicação Front-End & Back-End com LLMs em Sistemas Distribuídos</p>
+        <div style="background: #0f172a; padding: 12px 24px; border-radius: 20px; display: inline-block; margin: 0 auto; border: 1px solid #334155;">
+          <strong>Grupo 4:</strong> Felipe e Equipe &nbsp;|&nbsp; Modelo em Produção: <strong>Google Gemini</strong>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Apresentação Grupo 4</span>
+        <span>Slide 1 de 8</span>
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 2: O PROBLEMA & A REGRA DE OURO -->
+    <!-- ================================================================== -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <h2 class="slide-title">1. Por que NÃO chamar o LLM direto do Front-End?</h2>
+        <span class="slide-subtitle">Segurança & Regra de Ouro</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card" style="border-color: #ef4444;">
+            <h3 style="color: #f87171;">❌ Se a chamada fosse no Front-End:</h3>
+            <ul>
+              <li><strong>Vazamento fatal da API Key:</strong> Qualquer usuário abre o DevTools (F12) e copia sua chave.</li>
+              <li><strong>Alto Acoplamento:</strong> O front-end fica dependente das regras e formato daquela empresa específica.</li>
+              <li><strong>Sem Controle de Custos:</strong> Qualquer pessoa pode disparar milhares de requisições no seu cartão.</li>
+            </ul>
+          </div>
+          <div class="card" style="border-color: #22c55e;">
+            <h3 style="color: #4ade80;">✅ Solução com Back-End Intermediário:</h3>
+            <ul>
+              <li><strong>Chave 100% Segura:</strong> Fica guardada no arquivo <code>.env</code> no servidor.</li>
+              <li><strong>Baixo Acoplamento:</strong> O navegador só fala com o nosso servidor via JSON simples.</li>
+              <li><strong>Injeção do System Prompt:</strong> O servidor define a personalidade e regras sem o usuário adulterar.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Segurança de Chaves e Acoplamento</span>
+        <span>Slide 2 de 8</span>
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 3: ARQUITETURA DISTRIBUÍDA -->
+    <!-- ================================================================== -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <h2 class="slide-title">2. Arquitetura do Sistema Distribuído</h2>
+        <span class="slide-subtitle">O Fluxo de Comunicação em 3 Nós</span>
+      </div>
+      <div class="slide-body">
+        <p style="text-align: center; color: #94a3b8;">Nossa aplicação é um <strong>sistema distribuído</strong> dividido em 3 partes independentes:</p>
+        
+        <div class="flow-diagram">
+          <div class="flow-step">
+            <div class="flow-box">1. Navegador (Cliente)</div>
+            <div class="flow-desc">index.html<br>Interface visual simples</div>
+          </div>
+
+          <div class="flow-arrow">➡️</div>
+
+          <div class="flow-step">
+            <div class="flow-box highlight">2. Servidor (Back-End)</div>
+            <div class="flow-desc">server.js (Node/Express)<br>Protege a chave + System Prompt</div>
+          </div>
+
+          <div class="flow-arrow">➡️</div>
+
+          <div class="flow-step">
+            <div class="flow-box">3. Provedor de LLM (Nuvem)</div>
+            <div class="flow-desc">Google Gemini / OpenAI<br>Processa a inteligência</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 10px;">
+          <p>📌 <strong>Protocolo:</strong> HTTP REST com formato de dados <code>JSON</code>. O front-end envia <code>{ message: "..." }</code> e recebe <code>{ reply: "...", provider: "..." }</code>.</p>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Arquitetura Cliente-Servidor-Nuvem</span>
+        <span>Slide 3 de 8</span>
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 4: O FRONT-END (index.html) -->
+    <!-- ================================================================== -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <h2 class="slide-title">3. O Front-End: Simples e Desacoplado</h2>
+        <span class="slide-subtitle">index.html</span>
+      </div>
+      <div class="slide-body">
+        <p>O front-end é minimalista: ele <strong>não sabe</strong> o que é Gemini ou GPT. Ele apenas faz um <code>fetch</code> para a rota <code>/api/chat</code>:</p>
+        
+        <pre><code>// O Front-End envia a mensagem digitada pelo usuário via POST
+const resposta = await fetch('/api/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: mensagemDoUsuario })
+});
+
+const dados = await resposta.json();
+// Exibe a resposta recebida na tela
+adicionarMensagem(dados.reply, 'bot', dados.provider);</code></pre>
+
+        <p style="color: #cbd5e1; font-size: 0.95rem;">💡 <strong>Por que isso é bom?</strong> Se mudarmos de provedor amanhã, o código do front-end <strong>não muda nem uma linha</strong>!</p>
+      </div>
+      <div class="slide-footer">
+        <span>Front-End Desacoplado</span>
+        <span>Slide 4 de 8</span>
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 5: O BACK-END (server.js) -->
+    <!-- ================================================================== -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <h2 class="slide-title">4. O Back-End: O Guardião Seguro</h2>
+        <span class="slide-subtitle">server.js (Node.js + Express)</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <h3>🛡️ Responsabilidades do Back-End:</h3>
+            <ul>
+              <li>Recebe o <code>POST /api/chat</code> vindo do navegador.</li>
+              <li>Lê a chave secreta com segurança via <code>dotenv</code> (<code>.env</code>).</li>
+              <li>Junta a mensagem do usuário com o <strong>System Prompt</strong>.</li>
+              <li>Chama a API do LLM com a chave protegida.</li>
+              <li>Entrega a resposta limpa para o usuário.</li>
+            </ul>
+          </div>
+          <div>
+            <pre><code>// No server.js:
+const apiKey = process.env.GEMINI_API_KEY;
+
+// Faz a requisição protegida para a nuvem
+const response = await fetch(urlComKey, {
+  method: 'POST',
+  body: JSON.stringify({
+    system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+    contents: [{ parts: [{ text: message }] }]
+  })
+});</code></pre>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Back-End como Proxy Seguro</span>
+        <span>Slide 5 de 8</span>
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 6: O SYSTEM PROMPT -->
+    <!-- ================================================================== -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <h2 class="slide-title">5. O que é o System Prompt?</h2>
+        <span class="slide-subtitle">Definindo a personalidade e regras da IA</span>
+      </div>
+      <div class="slide-body">
+        <p>O <strong>System Prompt</strong> são as instruções que o modelo recebe antes de começar a conversa. Ele orienta tom de voz, regras e limites:</p>
+
+        <pre><code>const SYSTEM_PROMPT = `Você é um assistente acadêmico amigável e didático 
+na aula de Desenvolvimento Web do professor Renato. 
+Responda de forma clara, objetiva, bem-humorada e sempre em português brasileiro. 
+Mantenha respostas curtas (máximo 2 a 3 parágrafos).`;</code></pre>
+
+        <div class="grid-2" style="margin-top: 10px;">
+          <div class="card">
+            <h3>🔒 Por que fica no Back-End?</h3>
+            <p>Se ficasse no front-end, qualquer usuário poderia inspecionar e alterar as instruções ou fazer "Prompt Injection".</p>
+          </div>
+          <div class="card">
+            <h3>🎯 Benefício Prático</h3>
+            <p>Garante que a IA sempre atue como tutor da matéria, sem se desviar do propósito acadêmico.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Instruções de Sistema</span>
+        <span>Slide 6 de 8</span>
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 7: TROCANDO DE PROVEDOR (DESACOPLAMENTO) -->
+    <!-- ================================================================== -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <h2 class="slide-title">6. Desacoplamento: Troca de Provedor</h2>
+        <span class="slide-subtitle">Mudando apenas 1 linha no server.js!</span>
+      </div>
+      <div class="slide-body">
+        <p>Em sistemas distribuídos modernos, nunca devemos ficar "presos" a um único fornecedor (<em>Vendor Lock-in</em>):</p>
+
+        <pre><code>// No server.js - Basta alterar esta linha ou no arquivo .env:
+const PROVIDER = 'gemini';   // ✅ Chamada real ao Google Gemini
+// const PROVIDER = 'openai';   // 🤖 Troca para OpenAI (gpt-4o-mini)
+// const PROVIDER = 'anthropic';// 🧠 Troca para Claude (Anthropic)</code></pre>
+
+        <div class="card" style="background: #022c22; border-color: #10b981;">
+          <h3 style="color: #34d399;">✨ O Grande Aprendizado do Grupo 4:</h3>
+          <p>O <strong>front-end (index.html) não sofreu nenhuma alteração</strong>! O contrato da API interna (<code>/api/chat</code>) continua idêntico. Isso é a essência de uma arquitetura limpa e de <strong>baixo acoplamento</strong>.</p>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Demonstração Prática & Desacoplamento</span>
+        <span>Slide 7 de 8</span>
+      </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 8: PERGUNTA-DESAFIO & CONCLUSÃO -->
+    <!-- ================================================================== -->
+    <div class="slide" id="slide-8">
+      <div class="slide-header">
+        <h2 class="slide-title">7. Pergunta-Desafio para a Turma</h2>
+        <span class="slide-subtitle">Hora de Testar os Colegas! 🎯</span>
+      </div>
+      <div class="slide-body" style="justify-content: center; text-align: center; gap: 24px;">
+        <div class="card" style="border: 2px solid #f59e0b; padding: 30px; background: #1c1917;">
+          <h3 style="color: #fbbf24; font-size: 1.4rem; justify-content: center;">❓ Pergunta para a turma:</h3>
+          <p style="font-size: 1.25rem; margin-top: 16px; color: #f8fafc; font-style: italic;">
+            "Se um desenvolvedor colocar a API Key diretamente no JavaScript do front-end (index.html), o que um usuário comum precisa fazer para roubar essa chave?"
+          </p>
+        </div>
+
+        <div style="background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid #334155;">
+          <p style="color: #94a3b8; font-size: 0.95rem;">
+            <strong>Resposta esperada:</strong> Basta apertar <code>F12</code> no navegador (Inspecionar Elemento), ir na aba <em>Sources</em> ou <em>Network</em> e copiar o texto da chave. Por isso, a chave SEMPRE deve ficar no back-end!
+          </p>
+        </div>
+        <p style="color: #38bdf8; font-size: 1.1rem; font-weight: bold;">Obrigado a todos! Vamos para a demonstração prática! 🚀</p>
+      </div>
+      <div class="slide-footer">
+        <span>Conclusão e Desafio</span>
+        <span>Slide 8 de 8</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Controles de Navegação -->
+  <div class="controls">
+    <button class="nav-btn" id="prevBtn" onclick="mudarSlide(-1)">⬅️ Anterior</button>
+    <span class="slide-counter" id="slideCounter">Slide 1 de 8</span>
+    <button class="nav-btn" id="nextBtn" onclick="mudarSlide(1)">Próximo ➡️</button>
+  </div>
+  <div class="shortcut-hint">
+    Dica: Você também pode usar as setas do teclado (⬅️ e ➡️) para passar os slides.
+  </div>
+
+  <script>
+    let slideAtual = 1;
+    const totalSlides = 8;
+
+    function atualizarSlide() {
+      // Esconde todos os slides
+      for (let i = 1; i <= totalSlides; i++) {
+        const el = document.getElementById(`slide-${i}`);
+        if (el) {
+          el.classList.remove('active');
+        }
+      }
+
+      // Mostra o slide atual
+      const ativo = document.getElementById(`slide-${slideAtual}`);
+      if (ativo) {
+        ativo.classList.add('active');
+      }
+
+      // Atualiza contador
+      document.getElementById('slideCounter').textContent = `Slide ${slideAtual} de ${totalSlides}`;
+
+      // Habilita / desabilita botões
+      document.getElementById('prevBtn').disabled = (slideAtual === 1);
+      document.getElementById('nextBtn').disabled = (slideAtual === totalSlides);
+    }
+
+    function mudarSlide(direcao) {
+      slideAtual += direcao;
+      if (slideAtual < 1) slideAtual = 1;
+      if (slideAtual > totalSlides) slideAtual = totalSlides;
+      atualizarSlide();
+    }
+
+    // Navegação por teclado
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        if (slideAtual < totalSlides) mudarSlide(1);
+      } else if (e.key === 'ArrowLeft') {
+        if (slideAtual > 1) mudarSlide(-1);
+      }
+    });
+
+    atualizarSlide();
+  </script>
+</body>
+</html>
