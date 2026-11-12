@@ -308,8 +308,12 @@
       const msgDiv = document.createElement('div');
       msgDiv.classList.add('message', remetente);
 
-      // Converte quebras de linha em <br> para leitura fácil
-      msgDiv.innerHTML = texto.replace(/\n/g, '<br>');
+      // Converte formatação básica de markdown para HTML limpo
+      const htmlFormatado = texto
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+
+      msgDiv.innerHTML = htmlFormatado;
 
       // Se for resposta do bot, mostra qual provedor respondeu
       if (remetente === 'bot' && provedor) {

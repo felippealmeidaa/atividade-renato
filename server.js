@@ -22,7 +22,7 @@ app.get('/slides', (req, res) => {
 // do usuário digitar qualquer coisa.
 const SYSTEM_PROMPT = `Você é um assistente acadêmico amigável e didático na aula de Desenvolvimento Web do professor Renato. 
 Responda de forma clara, objetiva, bem-humorada e sempre em português brasileiro. 
-Mantenha respostas curtas (máximo 2 a 3 parágrafos) para caber bem na interface de chat.`;
+Mantenha respostas concisas (máximo 2 a 3 parágrafos) e sempre conclua suas frases e pensamentos de forma completa.`;
 
 // ============================================================================
 // 2. CONFIGURAÇÃO DO PROVEDOR (DESACOPLAMENTO)
@@ -60,6 +60,10 @@ async function chamarGemini(mensagemDoUsuario) {
           parts: [{ text: mensagemDoUsuario }],
         },
       ],
+      generationConfig: {
+        maxOutputTokens: 1200,
+        temperature: 0.7,
+      },
     }),
   });
 
@@ -69,7 +73,9 @@ async function chamarGemini(mensagemDoUsuario) {
   }
 
   const data = await response.json();
-  const respostaTexto = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  const parts = data.candidates?.[0]?.content?.parts || [];
+  // Concatena todas as partes de texto para nunca cortar a resposta
+  const respostaTexto = parts.map(p => p.text || '').filter(Boolean).join('');
   return respostaTexto || 'Não foi possível obter resposta do Gemini.';
 }
 
