@@ -42,8 +42,8 @@ async function chamarGemini(mensagemDoUsuario) {
     throw new Error('Chave do Gemini não configurada! Adicione GEMINI_API_KEY no arquivo .env');
   }
 
-  // Endpoint oficial da API do Gemini (usando o modelo rápido e atualizado gemini-2.5-flash)
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  // Endpoint oficial da API do Gemini (usando o modelo leve e rapido gemini-3.5-flash-lite)
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
 
   const response = await fetch(url, {
     method: 'POST',

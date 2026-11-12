@@ -22,7 +22,7 @@ O sistema é dividido em três camadas independentes:
 
 1. **Front-End (`public/index.html`):** Interface construída com HTML5, CSS3 e JavaScript puro. Comunica-se exclusivamente com a API local, desconhecendo qual provedor de IA está em operação.
 2. **Back-End (`server.js`):** Servidor Node.js que atua como proxy reverso seguro. Responsável por armazenar as credenciais, injetar as regras de conduta (*System Prompt*) e padronizar o payload enviado ao cliente.
-3. **Provedor de LLM:** API externa (Google Gemini em produção, com suporte configurável para OpenAI e Anthropic).
+3. **Provedor de LLM:** API externa (Google Gemini `gemini-3.5-flash-lite` em produção, com suporte configurável para OpenAI e Anthropic).
 
 ---
 
