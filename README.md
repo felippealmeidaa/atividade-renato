@@ -99,3 +99,11 @@ Reinicie o servidor (`npm start`) para aplicar a alteração.
 
 - As chaves de API são armazenadas exclusivamente no arquivo `.env` no servidor e nunca são expostas ao navegador do cliente.
 - O arquivo `.env` está listado no `.gitignore`, evitando que credenciais sejam versionadas no repositório.
+
+---
+
+## 👥 Integrantes - Grupo 4
+- Felippe Almeida
+- Guilherme Henrique
+- Paula Tomazelli
+- João Victor Domingues
