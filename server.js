@@ -10,6 +10,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public')); // Serve o front-end (index.html)
 
+// Rota auxiliar para abrir os slides da apresentação diretamente pelo navegador
+app.get('/slides', (req, res) => {
+  res.sendFile(__dirname + '/slides.html');
+});
+
 // ============================================================================
 // 1. SYSTEM PROMPT (Comportamento da IA)
 // ============================================================================

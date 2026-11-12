@@ -67,6 +67,14 @@
       font-weight: 600;
       padding: 4px 10px;
       border-radius: 20px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-group:hover {
+      background: #2563eb;
     }
 
     .system-diagram {
@@ -238,7 +246,10 @@
     <header>
       <div class="header-top">
         <h1>💬 Mini Chat com LLM</h1>
-        <span class="badge-group">Grupo 4</span>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <a href="/slides" target="_blank" class="badge-group" style="background: #10b981;">📺 Ver Slides</a>
+          <span class="badge-group">Grupo 4</span>
+        </div>
       </div>
       <div class="system-diagram">
         <span>Arquitetura:</span>

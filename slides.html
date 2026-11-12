@@ -206,6 +206,24 @@
       margin-top: 20px;
     }
 
+    a.demo-link-btn {
+      background: #10b981;
+      color: white;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    a.demo-link-btn:hover {
+      background: #059669;
+    }
+
     button.nav-btn {
       background: #2563eb;
       color: white;
@@ -513,6 +531,7 @@ const PROVIDER = 'gemini';   // ✅ Chamada real ao Google Gemini
     <button class="nav-btn" id="prevBtn" onclick="mudarSlide(-1)">⬅️ Anterior</button>
     <span class="slide-counter" id="slideCounter">Slide 1 de 8</span>
     <button class="nav-btn" id="nextBtn" onclick="mudarSlide(1)">Próximo ➡️</button>
+    <a href="/" target="_blank" class="demo-link-btn">💬 Abrir Chat ao Vivo</a>
   </div>
   <div class="shortcut-hint">
     Dica: Você também pode usar as setas do teclado (⬅️ e ➡️) para passar os slides.
