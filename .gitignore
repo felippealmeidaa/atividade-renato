@@ -4,6 +4,9 @@ node_modules/
 # Arquivo com chaves secretas (NUNCA SUBIR PARA O GITHUB!)
 .env
 
+# Roteiro interno de estudos da equipe
+ROTEIRO_APRESENTACAO.md
+
 # Arquivos de log do sistema
 npm-debug.log*
 yarn-debug.log*
