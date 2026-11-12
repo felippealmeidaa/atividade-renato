@@ -130,3 +130,4 @@ Se você esquecer de tudo na hora, lembre-se apenas destas **4 frases**:
 
 ### 4. "O que significa 'rate limit' que o Grupo 3 citou?"
 - **Resposta:** *"Rate limit é o limite de requisições por minuto que a API do provedor permite. Com o back-end centralizando as chamadas, podemos no futuro criar uma fila ou cache para evitar estourar esse limite, algo impossível se cada usuário chamasse direto do front-end."*
+
